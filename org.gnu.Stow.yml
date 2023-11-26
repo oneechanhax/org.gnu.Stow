@@ -1,0 +1,49 @@
+app-id: org.gnu.Stow
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+command: /app/bin/stow
+finish-args:
+  - --filesystem=host
+modules:
+  - name: perl
+    buildsystem: simple
+    post-install:
+      - |
+        chmod 755 /app/lib/perl5/5/core_perl/auto/*/*.so
+        chmod 755 /app/lib/perl5/5/core_perl/auto/*/*/*.so
+        chmod 755 /app/lib/perl5/5/core_perl/auto/*/*/*/*.so
+        chmod 755 /app/lib/perl5/5/core_perl/CORE/libperl.so
+    build-commands:
+      - |
+        ./Configure -des -Dusethreads -Duseshrplib -Doptimize="${CFLAGS}" -Dprefix=/app -Dvendorprefix=/app -Dprivlib=/app/share/perl5/core_perl -Darchlib=/app/lib/perl5/5/core_perl -Dsitelib=/app/share/perl5/site_perl -Dsitearch=/app/lib/perl5/5/site_perl -Dvendorlib=/app/share/perl5/vendor_perl -Dvendorarch=/app/lib/perl5/5/vendor_perl -Dscriptdir=/app/bin/core_perl -Dsitescript=/app/bin/site_perl -Dvendorscript=/app/bin/vendor_perl -Dinc_version_list=none -Dman1ext=1perl -Dman3ext=3perl -Dlddlflags="-shared ${LDFLAGS}" -Dldflags="${LDFLAGS}"
+        make -j17
+        make install
+    sources:
+      - type: archive
+        url: https://www.cpan.org/src/5.0/perl-5.38.0.tar.xz
+        sha512: 71beff7f6daa22a967972f5805daf2d4ff837a17e5ab808780f815d5914a67acf4f2e92acac0f2d8b24bdde4ceec0c2f7cb3029b5eadeeb30191f757e1bf0f9d
+  - name: perl-io-stringy
+    no-autogen: true
+    sources:
+      - type: archive
+        url: https://cpan.metacpan.org/authors/id/C/CA/CAPOEIRAB/IO-Stringy-2.113.tar.gz
+        sha512: 5af104766c20b4336649dc4a19554ad204506c2476b4bf7d8ad7c2cfab15f0296efadb9019cd57e770a2a3c5f5686f7f010bddbd6efd51d300c54ca36286f094
+      - type: shell
+        commands:
+          - PERL_MM_USE_DEFAULT=1 PERL5LIB=/app/lib/perl5/vendor_perl/5.30.0 perl Makefile.PL PREFIX=/app INSTALLDIRS=vendor
+  - name: perl-test-output
+    no-autogen: true
+    sources:
+      - type: archive
+        url: https://search.cpan.org/CPAN/authors/id/B/BD/BDFOY/Test-Output-1.034.tar.gz
+        sha512: f7e6a121dbcaa6644b5128ba27c70894775bcb77e5c4abb3a2546d935cb1a99b3190230b2be76161377d0151665ec97303c48746b224d1b2301803e6082b0283  
+      - type: shell
+        commands:
+          - USE_DEFAULT=1 PERL5LIB=/app/lib/perl5/vendor_perl/5.30.0 perl Makefile.PL PREFIX=/app INSTALLDIRS=vendor
+  - name: stow
+    sources:
+      - type: archive
+        url: https://ftp.gnu.org/gnu/stow/stow-2.3.1.tar.gz
+        sha256: 09d5d99671b78537fd9b2c0b39a5e9761a7a0e979f6fdb7eabfa58ee45f03d4b
+
